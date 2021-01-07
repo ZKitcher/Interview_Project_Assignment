@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  font-family: "Quicksand";
+  color: #333;
+}
+body {
+  background: #fbfbfb;
+}
+button {
+  cursor: pointer;
+}
+button:hover {
+  box-shadow: 1px 3px 5px rgba(0,0,0,0.1);
+}
+.searchbar {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+  border-bottom: 1px solid #bdbdbd;
+}
+.searchbar h1 {
+  color: #f1356d;
+}
+.searchbar .search {
+  margin-left: auto;
+}
+.searchbar button {
+  margin-left: 16px;
+  text-decoration: none;
+}
+.searchbar a {
+  margin-left: 16px;
+  text-decoration: none;
+  padding: 6px;
+}
+.searchbar a:hover {
+  color: #f1356d;
+}
+.search button, .clickable {
+  background: #f1356d;
+  color: #fff;
+  border: 0;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.search button:hover, .clickable:hover {
+  background: #ff5e8e;
+}
+.search button:disabled, .clickable:disabled{
+  background: #833049;
+  color: rgb(218, 218, 218);
+  cursor: default;
+}
+.content {
+  max-width: 600px;
+  margin: 10px auto;
+  padding: 10px;
+}
+.weather-preview {
+  padding: 10px 16px;
+  margin: 10px 0;
+  border-bottom: 1px solid #d4d4d4;
+  background-color: #f5f5f5;
+}
+.weather-preview:hover {
+  box-shadow: 3px 3px 5px rgb(0 0 0 / 25%);
+}
+.weather-preview h2 {
+  font-size: 20px;
+  color: #f1356d;
+  margin-bottom: 8px;
+}
+.weather-preview .button-block, .close{
+  float: right;
+}
+.weather-preview button {
+  margin-left: 5px;
+}
+.weather-info {
+  border-left: 1px solid #ff7b00;
+  padding-left: 5px;
+}
+img {
+  background-color: #a2a2a2;
+  border-radius: 25px;
+}
+
+.modal {
+  position:fixed;
+  z-index: 1;
+  padding:0;
+  margin:0;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+.modal_content {
+  background-color: #e9e9e9;
+  position: relative;
+  margin: 20px auto;
+  top: 20%;
+  width: 40%;
+  max-width: 600px;
+  padding: 20px;
+  border-radius: 5px;
+  border: 2px solid black;
+  box-shadow: 3px 3px 5px rgb(0 0 0 / 25%);
+}
+.clickable {
+  display: inline;
+  margin-right: 15px;
+}
+.recommend-bar{
+  padding: 20px;
+  position: relative;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.status {
+  text-align: end;
+  color: #b9b9b9;
+}
