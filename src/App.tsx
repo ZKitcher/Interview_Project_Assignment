@@ -1,102 +1,185 @@
 import React, { useEffect, useState } from 'react';
-import Searchbar from './Searchbar';
-import Content from './Content';
-import UseFetch from './useFetch';
-import Status from './Status';
-import PopUp from "./PopUp"; 
+import Searchbar from './component/homePage/Searchbar';
+import WeatherList from './component/homePage/WeatherList';
+import Status from './component/homePage/Status';
+import PopUp from "./component/homePage/PopUp";
+require('dotenv').config({ path: './../.env' });
 
-const initialItems: Array<WeatherItemType> = []
-
-var timer:any;
+let timer: ReturnType<typeof setTimeout> | null;
 
 function App() {
+    const defaultStatus: string = '';
 
-	const [pulledList, setPulledList] = useState(initialItems)
+    const [pulledList, setPulledList] = useState<Array<WeatherItemType>>([]);
 
-	const [currentStaus, setcurrentStaus] = useState<string>("...")
+    const [currentStatus, setCurrentStatus] = useState<string>(defaultStatus);
 
-	const [popupState, setPopupState] = useState<boolean>(false)
+    const [popupState, setPopupState] = useState<boolean>(false);
 
-	const [popupDetails, setPopupDetails] = useState(initialItems)
+    const [popupDetails, setPopupDetails] = useState<popUpDetails>(pulledList[0]);
 
-	const [fetching, setFetching] = useState<boolean>(false)
+    const [isCurrentlyFetching, setIsCurrentlyFetching] = useState<boolean>(false);
 
-	const [tempFormat, setTempFormat] = useState<boolean>(false)
+    const [tempFormat, setTempFormat] = useState<boolean>(true);
 
-	useEffect(() => {
-		if(currentStaus !== "..."){
-			if (timer !== null) {
-				clearTimeout(timer);
-				timer = null;
-			}
-			timer = setTimeout(() => setcurrentStaus("..."), 2000);
-		}
-	},[currentStaus])
+    useEffect(() => {
+        if (currentStatus !== defaultStatus) {
+            if (timer !== null) {
+                clearTimeout(timer);
+                timer = null;
+            };
+            timer = setTimeout(() => setCurrentStatus(defaultStatus), 2000);
+        };
+    }, [currentStatus]);
 
-    const removeItem: removeItem = item => {
+    useEffect(() => {
+        setIsCurrentlyFetching(true)
+        listCurrentPosition().then(res => {
+            if (res.error === true) {
+                setIsCurrentlyFetching(false);
+                return;
+            };
+            const GeoAPIKey = process.env.REACT_APP_GEO_API_KEY;
+            const url: string = `http://api.geonames.org/findNearbyPostalCodesJSON?lat=${res.latitude}&lng=${res.longitude}&username=${GeoAPIKey}`;
+
+            fetch(url).then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Unable to locate user ZIP.');
+                };
+            }).then((responseJson) => {
+                const fetchResult: LonLatToPostal = responseJson;
+                console.log(fetchResult);
+                const ZIP: string = fetchResult.postalCodes[0].postalCode;
+                addWeatherItem(ZIP);
+            }).catch(err => {
+                setCurrentStatus(`Unable to Locate User`);
+            }).finally(() => {
+                setIsCurrentlyFetching(false);
+            });
+        })
+        function listCurrentPosition() {
+            return new Promise<LocProp>(function (responseObj) {
+                let coordinates: LocProp = {
+                    latitude: 0,
+                    longitude: 0,
+                    error: true
+                };
+                navigator.geolocation.getCurrentPosition(
+                    (success: GeolocationPosition) => {
+                        coordinates.latitude = success.coords.latitude;
+                        coordinates.longitude = success.coords.longitude;
+                        coordinates.error = false;
+                        responseObj(coordinates);
+                    },
+                    (error: GeolocationPositionError) => {
+                        responseObj(coordinates);
+                    });
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const removeWeatherItem: removeWeatherItem = item => {
         const newWeatherList = pulledList.filter(e => e.id !== item)
-		setPulledList(newWeatherList)
-		setcurrentStaus("Removing");
-    }
+        setPulledList(newWeatherList);
+        setCurrentStatus('Removing');
+    };
 
-    const showDetailed: showDetailed = item =>{
-		const detailed = pulledList.filter(e => e.id === item)
-		setPopupDetails(detailed)
-		setPopupState(true)
-	}
+    const showPopup: showPopup = item => {
+        const detailed = pulledList.filter(e => e.id === item);
+        setPopupDetails(detailed[0]);
+        setPopupState(true);
+    };
 
-	const closeDetailed: seenItem = () =>{
-		setPopupState(false)
-	}
+    const closePopup = () => {
+        setPopupState(false);
+    };
 
-	async function addItem(newItem:string) {
-		if(!fetching){
-			setFetching(true)
-			if(pulledList.find(e => e.id === newItem)){
-				setcurrentStaus(`${newItem} already listed.`)
-				return
-			}
-			let url: string = `http://api.openweathermap.org/data/2.5/weather?zip=${newItem}&appid=e3c9f16387de80dc9369c6a1a122ee82`
-			setcurrentStaus(`Fetching ${newItem}...`);
-			let res:any = await UseFetch(url)
-			if(res.cod === 200){
-        		let newRes: WeatherItemType = { 
-					id: newItem, 
-					current: res.weather[0].main, 
-					currentDesc: res.weather[0].description, 
-					city: res.name, 
-					country: res.sys.country, 
-					temp: res.main.temp, 
-					feelsLike: res.main.feels_like, 
-					humidity: res.main.humidity, 
-					wind: res.wind.speed, 
-					windDirection: res.wind.deg, 
-					icon: `http://openweathermap.org/img/wn/${res.weather[0].icon}.png`
-				};
-				setPulledList([...pulledList, newRes])
-			}else{
-				setcurrentStaus(`Invalid Zip Code.`);
-			}
-			setFetching(false)
-		}
-	}
+    async function addWeatherItem(newItem: string) {
+        if (isCurrentlyFetching) return;
+        setIsCurrentlyFetching(true);
+        if (pulledList.find(e => e.id === newItem)) {
+            setCurrentStatus(`${newItem} already listed.`);
+            setIsCurrentlyFetching(false);
+            return;
+        };
+        const openweatherAPIKey = process.env.REACT_APP_OW_API_KEY;
 
-	const clearList: removeItem = () =>{
-		setPulledList([])
-	}
+        const url: string = `http://api.openweathermap.org/data/2.5/weather?zip=${newItem}&appid=${openweatherAPIKey}`;
 
-	function flipTemp(current:boolean){
-        setTempFormat(!current)
-    }
+        setCurrentStatus(`Fetching ${newItem}...`);
 
-  	return (
-    	<div className="App">
-			{popupState ? <PopUp pointed={popupDetails} closePopUp={closeDetailed} tempFormat={tempFormat}/> : null}
-      		<Searchbar addItem={addItem} clearList={clearList} fetching={fetching}/>
-			<Status status={currentStaus} addItem={addItem} fetching={fetching}/>
-      		<Content pulledList={pulledList} title={"Current Weather"} removeItem={removeItem} showDetailed={showDetailed} tempFormat={tempFormat} flipTemp={flipTemp}/>
-    	</div>
-	);
+        fetch(url).then((response) => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Unable to locate ZIP.');
+            };
+        }).then((responseJson) => {
+            const res: NewWeatherRes = responseJson
+            let newRes: WeatherItemType = {
+                id: newItem,
+                current: res.weather[0].main,
+                currentDesc: res.weather[0].description,
+                city: res.name,
+                country: res.sys.country,
+                temp: res.main.temp,
+                feelsLike: res.main.feels_like,
+                humidity: res.main.humidity,
+                wind: res.wind.speed,
+                windDirection: res.wind.deg,
+                icon: `http://openweathermap.org/img/wn/${res.weather[0].icon}.png`
+            };
+            setPulledList([...pulledList, newRes])
+        }).catch((error) => {
+            console.log(error);
+            setCurrentStatus(`Invalid Zip Code.`);
+        }).finally(() => {
+            setIsCurrentlyFetching(false);
+        });
+    };
+
+    const clearList = () => {
+        setPulledList([]);
+    };
+
+    const flipTemp = () => {
+        setTempFormat(!tempFormat);
+    };
+
+    const popUpHTML: JSX.Element =
+        <PopUp
+            pointed={popupDetails}
+            closePopup={closePopup}
+            popupState={popupState}
+            tempFormat={tempFormat}
+        />
+
+    return (
+        <div className="App">
+            {popupState ? popUpHTML : null}
+            <Searchbar
+                addWeatherItem={addWeatherItem}
+                clearList={clearList}
+                isCurrentlyFetching={isCurrentlyFetching}
+            />
+            <Status
+                addWeatherItem={addWeatherItem}
+                isCurrentlyFetching={isCurrentlyFetching}
+                status={currentStatus}
+            />
+            <WeatherList
+                flipTemp={flipTemp}
+                pulledList={pulledList}
+                removeWeatherItem={removeWeatherItem}
+                showPopup={showPopup}
+                tempFormat={tempFormat}
+                title={"Current Weather"}
+            />
+        </div>
+    );
 }
 
 export default App;
