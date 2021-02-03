@@ -10,20 +10,8 @@ type WeatherItemType = {
     wind: number,
     windDirection: number,
     icon: string
-}
-
-interface popUpDetails {
-    id: string,
-    current: string,
-    currentDesc: string,
-    city: string,
-    country: string,
-    temp: number,
-    feelsLike: number,
-    humidity: number,
-    wind: number,
-    windDirection: number,
-    icon: string
+    lat: number,
+    lon: number
 }
 
 interface LocProp {
@@ -34,11 +22,15 @@ interface LocProp {
 
 type removeWeatherItem = (removeWeatherItem: string) => void;
 
+type selectedExpandedItem = (selectedExpandedItem: string) => void;
+
 type showPopup = (showPopup: string) => void;
 
 type addWeatherItem = (addWeatherItem: string) => Promise<void>;
 
 type updateStatus = (updateStatus: string) => void;
+
+declare module 'googlemaps';
 
 type NewWeatherRes = {
     coord: Coord;

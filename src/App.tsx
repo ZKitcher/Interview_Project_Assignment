@@ -3,6 +3,7 @@ import Searchbar from './component/homePage/Searchbar';
 import WeatherList from './component/homePage/WeatherList';
 import Status from './component/homePage/Status';
 import PopUp from "./component/homePage/PopUp";
+import { loadMapAPI } from './map/utils/GoogleMapUtils';
 require('dotenv').config({ path: './../.env' });
 
 let timer: ReturnType<typeof setTimeout> | null;
@@ -16,11 +17,15 @@ function App() {
 
     const [popupState, setPopupState] = useState<boolean>(false);
 
-    const [popupDetails, setPopupDetails] = useState<popUpDetails>(pulledList[0]);
+    const [popupDetails, setPopupDetails] = useState<WeatherItemType>(pulledList[0]);
+
+    const [expandedDetails, setExpandedDetails] = useState<string>("");
 
     const [isCurrentlyFetching, setIsCurrentlyFetching] = useState<boolean>(false);
 
     const [tempFormat, setTempFormat] = useState<boolean>(true);
+
+    const [mapScriptLoaded, setMapScriptLoaded] = useState<boolean>(false);
 
     useEffect(() => {
         if (currentStatus !== defaultStatus) {
@@ -78,6 +83,11 @@ function App() {
                     });
             });
         }
+
+        const googleMapScript = loadMapAPI();
+        googleMapScript.addEventListener('load', function() {
+            setMapScriptLoaded(true)
+        })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -130,9 +140,12 @@ function App() {
                 humidity: res.main.humidity,
                 wind: res.wind.speed,
                 windDirection: res.wind.deg,
-                icon: `http://openweathermap.org/img/wn/${res.weather[0].icon}.png`
+                icon: `http://openweathermap.org/img/wn/${res.weather[0].icon}.png`,
+                lat: res.coord.lat,
+                lon: res.coord.lon
             };
             setPulledList([...pulledList, newRes])
+            setExpandedDetails(newRes.id)
         }).catch((error) => {
             console.log(error);
             setCurrentStatus(`Invalid Zip Code.`);
@@ -147,6 +160,11 @@ function App() {
 
     const flipTemp = () => {
         setTempFormat(!tempFormat);
+    };
+
+    const changeSelectedExpanded: selectedExpandedItem = item => {
+        const newWeatherList = pulledList.filter(e => e.id === item)
+        setExpandedDetails(newWeatherList[0].id);
     };
 
     const popUpHTML: JSX.Element =
@@ -177,6 +195,9 @@ function App() {
                 showPopup={showPopup}
                 tempFormat={tempFormat}
                 title={"Current Weather"}
+                changeSelectedExpanded={changeSelectedExpanded}
+                ExpandedItem={expandedDetails}
+                mapLoaded={mapScriptLoaded}
             />
         </div>
     );
