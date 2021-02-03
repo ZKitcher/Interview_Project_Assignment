@@ -1,4 +1,5 @@
 import DisplayTemp from "./DisplayTemp";
+import ExpandedView from './ExpandedView'
 import Switch from '@material-ui/core/Switch';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -12,6 +13,9 @@ interface WeatherItemProp {
     showPopup: showPopup;
     tempFormat: boolean;
     flipTemp: VoidFunction;
+    changeSelectedExpanded: selectedExpandedItem;
+    ExpandedItem: string;
+    mapLoaded: boolean;
 };
 
 const AntSwitch = withStyles((theme: Theme) =>
@@ -52,50 +56,55 @@ const AntSwitch = withStyles((theme: Theme) =>
     }),
 )(Switch);
 
-const WeatherList: React.FC<WeatherItemProp> = ({ pulledList, title, removeWeatherItem, showPopup, tempFormat, flipTemp }) => {
+const WeatherList: React.FC<WeatherItemProp> = ({ pulledList, title, removeWeatherItem, showPopup, tempFormat, flipTemp, changeSelectedExpanded, ExpandedItem, mapLoaded }) => {
+
+    const selectedExpandedItem = pulledList.filter(e => e.id === ExpandedItem)
 
     return (
         <div className="content">
-            <div className="weather-list">
-                <h2>{title}</h2>
-                <Typography component="div">
-                    <Grid
-                        alignItems="center"
-                        container
-                        component="label"
-                        spacing={1}
-                    >
-                        <Grid item>Celsius</Grid>
-                        <Grid item>
-                            <AntSwitch checked={tempFormat} onChange={flipTemp} />
-                        </Grid>
-                        <Grid item>Fahrenheit</Grid>
+            <h2>{title}</h2>
+            <Typography component="div">
+                <Grid
+                    alignItems="center"
+                    container
+                    component="label"
+                    spacing={1}
+                >
+                    <Grid item>Celsius</Grid>
+                    <Grid item>
+                        <AntSwitch checked={tempFormat} onChange={flipTemp} />
                     </Grid>
-                </Typography>
-                {pulledList.map((e) => (
-                    <div className="weather-preview" key={e.id}>
-                        <div className="button-block">
-                            <Button
-                                color="secondary"
-                                variant="outlined"
-                                size="small"
-                                onClick={() => showPopup(e.id)}
-                            >Details</Button>
-                            <Button
-                                variant="outlined"
-                                size="small"
-                                onClick={() => removeWeatherItem(e.id)}
-                            >Remove</Button>
+                    <Grid item>Fahrenheit</Grid>
+                </Grid>
+            </Typography>
+            <div className="item-holder">
+                <div className="weather-list">
+                    {pulledList.map((e) => (
+                        <div className={e.id === ExpandedItem ? 'selected-item weather-preview' : 'weather-preview'} key={e.id}>
+                            <h2 className={e.id === ExpandedItem ? 'selected-heading' : ''} onClick={() => changeSelectedExpanded(e.id)}>{`${e.city}: ${e.id}`}</h2>
+                            <div className="button-block">
+                                <Button
+                                    color="secondary"
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => showPopup(e.id)}
+                                >Details</Button>
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => removeWeatherItem(e.id)}
+                                >Remove</Button>
+                            </div>
+                            <div className="weather-info">
+                                <h3>{e.current}</h3>
+                                <img src={e.icon} alt="icon" className="img-icon" />
+                                <p>{e.current}</p>
+                                <p>Current Temp: {<DisplayTemp temp={e.temp} format={tempFormat} />} </p>
+                            </div>
                         </div>
-                        <h2>{`${e.city}: ${e.id}`}</h2>
-                        <div className="weather-info">
-                            <h3>{e.current}</h3>
-                            <img src={e.icon} alt="icon" className="img-icon" />
-                            <p>{e.current}</p>
-                            <p>Current Temp: {<DisplayTemp temp={e.temp} format={tempFormat} />} </p>
-                        </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
+                {selectedExpandedItem.length === 1 ? <ExpandedView ExpandedItem={selectedExpandedItem[0]} tempFormat={tempFormat} mapLoaded={mapLoaded} />: null}
             </div>
         </div>
     );
