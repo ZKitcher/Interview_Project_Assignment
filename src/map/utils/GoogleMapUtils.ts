@@ -1,13 +1,13 @@
 require('dotenv').config({ path: './../../../.env' });
 
-const GOOGLE_API = process.env.REACT_APP_GOOGLE_API
+const GOOGLE_API = process.env.REACT_APP_GOOGLE_API;
 
 export const loadMapAPI = () => {
-    const mapsURL = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API}`
+    const mapsURL = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API}`;
     const scripts = document.getElementsByTagName('script');
 
-    for(let i = 0; i < scripts.length; i++){
-        if(scripts[i].src.indexOf(mapsURL) === 0){
+    for (let i = 0; i < scripts.length; i += 1) {
+        if (scripts[i].src.indexOf(mapsURL) === 0) {
             return scripts[i];
         }
     }
@@ -16,7 +16,7 @@ export const loadMapAPI = () => {
     googleMapScript.src = mapsURL;
     googleMapScript.async = true;
     googleMapScript.defer = true;
-    window.document.body.appendChild(googleMapScript)
+    window.document.body.appendChild(googleMapScript);
 
     return googleMapScript;
 };

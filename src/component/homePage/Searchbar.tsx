@@ -3,16 +3,15 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 
 interface SearchBarProp {
-    addWeatherItem: addWeatherItem;
+    addWeatherItem: AddWeatherItem;
     clearList: VoidFunction;
     isCurrentlyFetching: boolean;
-};
+}
 
 const Searchbar: React.FC<SearchBarProp> = ({ addWeatherItem, clearList, isCurrentlyFetching }) => {
+    const title = 'Weather Service';
 
-    const title: string = 'Weather Service';
-
-    const [ZIP, setZIP] = useState<string>("");
+    const [ZIP, setZIP] = useState<string>('');
 
     const [isSearchDisabled, setIsSearchDisabled] = useState<boolean>(true);
 
@@ -23,27 +22,26 @@ const Searchbar: React.FC<SearchBarProp> = ({ addWeatherItem, clearList, isCurre
             setIsSearchDisabled(false);
         } else {
             setIsSearchDisabled(true);
-        };
+        }
     };
 
     const handleSearch = () => {
-        console.log('test');
         addWeatherItem(ZIP);
         setIsSearchDisabled(true);
-        setZIP("");
+        setZIP('');
     };
 
     const handleClear = () => {
         clearList();
-        setZIP("");
+        setZIP('');
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !(isSearchDisabled || isCurrentlyFetching)) {
+        if (e.key === 'Enter' && !(isSearchDisabled || isCurrentlyFetching)) {
             addWeatherItem(ZIP);
             setIsSearchDisabled(true);
-            setZIP("");
-        };
+            setZIP('');
+        }
     };
 
     return (
@@ -64,15 +62,19 @@ const Searchbar: React.FC<SearchBarProp> = ({ addWeatherItem, clearList, isCurre
                     variant="contained"
                     size="medium"
                     onClick={handleSearch}
-                >Search ZIP</Button>
+                >
+Search ZIP
+                </Button>
                 <Button
                     variant="contained"
                     size="medium"
                     onClick={handleClear}
-                >Clear All</Button>
+                >
+Clear All
+                </Button>
             </div>
         </nav>
     );
-}
+};
 
 export default Searchbar;
