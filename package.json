@@ -45,6 +45,7 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/react": "^11.2.3"
+    "@testing-library/react": "^11.2.3",
+    "@types/googlemaps": "^3.43.2"
   }
 }
