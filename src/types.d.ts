@@ -12,7 +12,7 @@ type WeatherItemType = {
     icon: string
     lat: number,
     lon: number
-}
+};
 
 interface LocProp {
     latitude: number,
@@ -20,17 +20,17 @@ interface LocProp {
     error: boolean,
 }
 
-type removeWeatherItem = (removeWeatherItem: string) => void;
+type RemoveWeatherItem = (removeWeatherItem: string) => void;
 
-type selectedExpandedItem = (selectedExpandedItem: string) => void;
+type SelectedExpandedItem = (selectedExpandedItem: string) => void;
 
-type showPopup = (showPopup: string) => void;
+type ShowPopup = (showPopup: string) => void;
 
-type addWeatherItem = (addWeatherItem: string) => Promise<void>;
+type AddWeatherItem = (addWeatherItem: string) => Promise<void>;
 
-type updateStatus = (updateStatus: string) => void;
+type UpdateStatus = (updateStatus: string) => void;
 
-declare module 'googlemaps';
+// declare module 'googlemaps';
 
 type NewWeatherRes = {
     coord: Coord;
@@ -46,17 +46,17 @@ type NewWeatherRes = {
     id: number;
     name: string;
     cod: number;
-}
+};
 type Coord = {
     lon: number;
     lat: number;
-}
+};
 type WeatherEntity = {
     id: number;
     main: string;
     description: string;
     icon: string;
-}
+};
 type Main = {
     temp: number;
     feels_like: number;
@@ -64,26 +64,26 @@ type Main = {
     temp_max: number;
     pressure: number;
     humidity: number;
-}
+};
 type Wind = {
     speed: number;
     deg: number;
-}
+};
 type Clouds = {
     all: number;
-}
+};
 type Sys = {
     type: number;
     id: number;
     country: string;
     sunrise: number;
     sunset: number;
-}
+};
 
 type GeoLocItem = {
     coords: Coords;
     timestamp: number;
-}
+};
 type Coords = {
     accuracy: number;
     altitude?: null;
@@ -92,12 +92,11 @@ type Coords = {
     latitude: number;
     longitude: number;
     speed?: null;
-}
-
+};
 
 type LonLatToPostal = {
     postalCodes: (PostalCodesEntity)[];
-}
+};
 
 type PostalCodesEntity = {
     adminCode2: string;
@@ -112,4 +111,4 @@ type PostalCodesEntity = {
     adminName1: string;
     placeName: string;
     lat: number;
-}
+};

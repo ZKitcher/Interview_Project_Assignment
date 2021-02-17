@@ -1,21 +1,25 @@
-interface tempProp {
-    temp: number;
-    format: boolean
-};
+import React from 'react';
 
-const DisplayTemp: React.FC<tempProp> = ({ temp, format }) => {
+interface TempProp {
+    temp: number,
+    format: boolean;
+}
 
+const DisplayTemp: React.FC<TempProp> = ({ temp, format }) => {
     let temperature: number;
     if (format) {
-        //F
+        // F
         temperature = Math.floor((temp - 273.15) * 1.8) + 32;
     } else {
-        //C
+        // C
         temperature = Math.floor((temp - 273.15));
     }
 
     return (
-        <span>{temperature} {format ? "°F" : "°C"}</span>
+        <span>
+            {temperature}
+            {format ? '°F' : '°C'}
+        </span>
     );
 };
 
